@@ -1,4 +1,4 @@
-package com.sergiolemos.backend.domain;
+package com.sergiolemos.backend.service;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -34,7 +34,20 @@ public class CnabService {
 
         var jobParameters = new JobParametersBuilder()
                 .addJobParameter("cnab",file.getOriginalFilename(),String.class,true)
-                .addJobParameter("cnabFile","file:"+targetLocation.toString(),String.class)
+                .addJobParameter("cnabFile","file:"+targetLocation.toString(),String.class,false)
+                .toJobParameters();
+
+        jobLauncher.run(job,jobParameters);
+    }
+
+    public void uploadCnab150File(MultipartFile file) throws Exception {
+        var fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        var targetLocation = fileStorageLocation.resolve(fileName);
+        file.transferTo(targetLocation);
+
+        var jobParameters = new JobParametersBuilder()
+                .addJobParameter("cnab",file.getOriginalFilename(),String.class,true)
+                .addJobParameter("cnabFile","file:"+targetLocation.toString(),String.class,false)
                 .toJobParameters();
 
         jobLauncher.run(job,jobParameters);

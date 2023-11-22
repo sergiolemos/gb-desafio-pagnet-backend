@@ -1,7 +1,8 @@
 package com.sergiolemos.backend.job;
 
-import com.sergiolemos.backend.domain.Transacao;
-import com.sergiolemos.backend.domain.TransacaoCNAB;
+import com.sergiolemos.backend.entity.TipoTransacao;
+import com.sergiolemos.backend.entity.Transacao;
+import com.sergiolemos.backend.entity.TransacaoCNAB;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -30,7 +31,6 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 
 @Configuration
-
 public class BatchConfig {
 
     private PlatformTransactionManager transactionManager;
@@ -95,11 +95,16 @@ public class BatchConfig {
     @Bean
     ItemProcessor<TransacaoCNAB, Transacao> processor() {
         return item -> {
+            var tipoTransacao = TipoTransacao.findByTipo(item.tipo());
+            var valorNormalizado = item.valor()
+                    .divide(new BigDecimal(100))
+                    .multiply(tipoTransacao.getSinal());
+
             var transacao = new Transacao(
                     null,
                     item.tipo(),
                     null,
-                    item.valor().divide(BigDecimal.valueOf(100)),
+                    valorNormalizado,
                     item.cpf(),
                     item.cartao(),
                     null,

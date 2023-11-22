@@ -1,0 +1,37 @@
+package com.sergiolemos.backend.service;
+
+import com.sergiolemos.backend.entity.TransacaoReport;
+import com.sergiolemos.backend.repository.TransacaoRepository;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+@Service
+public class TransacaoService {
+
+    private final TransacaoRepository transacaoRepository;
+
+    public TransacaoService(TransacaoRepository transacaoRepository) {
+        this.transacaoRepository = transacaoRepository;
+    }
+
+    public List<TransacaoReport> listTotaisTransacaoPorNomeDaLoja() {
+        var transacoes = transacaoRepository.findAllByOrderByNomeDaLojaAscIdDesc();
+        var reportMap = new LinkedHashMap<String, TransacaoReport>();
+
+        transacoes.forEach(transacao -> {
+            String nomeDaLoja = transacao.nomeDaLoja();
+            var valor = transacao.valor();
+
+            reportMap.compute(nomeDaLoja,(key,existingReport)->{
+               var report = (existingReport != null) ? existingReport:new TransacaoReport(key,BigDecimal.ZERO,new ArrayList<>());
+               return report.addTotal(valor).addTransacao(transacao.withValor(valor));
+            });
+        });
+
+        return new ArrayList<>(reportMap.values());
+    }
+}

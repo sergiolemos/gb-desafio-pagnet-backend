@@ -1,4 +1,7 @@
-package com.sergiolemos.backend.domain;
+package com.sergiolemos.backend.entity;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -7,17 +10,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public record Transacao(
-    Long id,
-    Integer tipo,
-    Date data,
-    BigDecimal valor,
-    Long cpf,
-    String cartao,
-    Time hora,
-    String donoDaLoja,
-    String nomeDaLoja) {
+        @Id Long id,
+        Integer tipo,
+        Date data,
+        BigDecimal valor,
+        Long cpf,
+        String cartao,
+        Time hora,
+        @Column("dono_loja") String donoDaLoja,
+        @Column("nome_loja") String nomeDaLoja) {
 
-    public Transacao withValor(BigDecimal valor){
+    public Transacao withValor(BigDecimal valor) {
         return new Transacao(
                 id,
                 tipo,

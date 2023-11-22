@@ -1,4 +1,4 @@
-package com.sergiolemos.backend.domain;
+package com.sergiolemos.backend.entity;
 
 import java.math.BigDecimal;
 
